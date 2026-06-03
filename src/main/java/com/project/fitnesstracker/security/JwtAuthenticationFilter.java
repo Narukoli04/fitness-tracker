@@ -19,45 +19,64 @@ import java.util.List;
 
 @Component
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
+
     @Autowired
     private JwtUtils jwtUtils;
-    //private UserDetailsService userDetailsService;
-
 
     @Override
-    protected void doFilterInternal(HttpServletRequest request,
-                                    HttpServletResponse response,
-                                    FilterChain filterChain) throws ServletException, IOException  {
+    protected void doFilterInternal(
+            HttpServletRequest request,
+            HttpServletResponse response,
+            FilterChain filterChain)
+            throws ServletException, IOException {
+
         System.out.println("Authentication Called");
-        try{
-String jwt=parseJwt(request);
-if(jwt!=null && jwtUtils.validateToken(jwt)){
-    String userid=jwtUtils.getUserIdFromToken(jwt);
 
-//    UserDetailsService userDetails= (UserDetailsService) userDetailsService.loadUserByUsername(username);
-    Claims claims=jwtUtils.getAllClaims(jwt);
-    List<String> roles=claims.get("roles",List.class);
+        try {
 
-    List<GrantedAuthority>authorities=List.of();
-           if(roles!=null) {
-               authorities = roles.stream()
-                       .map(role -> (GrantedAuthority) new SimpleGrantedAuthority(role))
-                       .toList();
-           }
+            String jwt = parseJwt(request);
 
-    UsernamePasswordAuthenticationToken authentication=new UsernamePasswordAuthenticationToken(userid,null, List.of());
-    authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
-    SecurityContextHolder.getContext().setAuthentication(authentication);
+            if (jwt != null && jwtUtils.validateToken(jwt)) {
 
-}
-        }catch(Exception e){
+                String userId = jwtUtils.getUserIdFromToken(jwt);
+
+                Claims claims = jwtUtils.getAllClaims(jwt);
+
+                List<String> roles = claims.get("roles", List.class);
+
+                List<GrantedAuthority> authorities = new java.util.ArrayList<>();
+
+                if (roles != null) {
+                    authorities = roles.stream()
+                            .map(role -> (GrantedAuthority) new SimpleGrantedAuthority("ROLE_" + role))
+                            .collect(java.util.stream.Collectors.toList());
+                }
+
+                UsernamePasswordAuthenticationToken authentication =
+                        new UsernamePasswordAuthenticationToken(
+                                userId,
+                                null,
+                                authorities
+                        );
+
+                authentication.setDetails(
+                        new WebAuthenticationDetailsSource()
+                                .buildDetails(request)
+                );
+
+                SecurityContextHolder
+                        .getContext()
+                        .setAuthentication(authentication);
+            }
+
+        } catch (Exception e) {
             e.printStackTrace();
-
         }
-        filterChain.doFilter(request,response);
+
+        filterChain.doFilter(request, response);
     }
+
     private String parseJwt(HttpServletRequest request) {
-        String jwt=jwtUtils.getJwtFromHeader(request);
-        return jwt;
+        return jwtUtils.getJwtFromHeader(request);
     }
 }

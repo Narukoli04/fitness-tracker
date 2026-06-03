@@ -1,48 +1,60 @@
 package com.project.fitnesstracker.controller;
 
 import com.project.fitnesstracker.dto.RecommendationRequest;
-import com.project.fitnesstracker.entity.Recommendation;
+import com.project.fitnesstracker.dto.RecommendationResponse;
 import com.project.fitnesstracker.service.RecommendationService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
 @RequiredArgsConstructor
 @RestController
-@RequestMapping("/api/recommendation")
+@RequestMapping("/api/recommendations")
 public class RecommendationController {
+
     private final RecommendationService recommendationService;
 
     @PostMapping("/generate")
-    public ResponseEntity<Recommendation> generateRecommendation(
-            @RequestBody RecommendationRequest request
-
-    ){
-        Recommendation recommendation=recommendationService.generateRecommendation(request);
-                return ResponseEntity.ok(recommendation);
-
-
+    public ResponseEntity<RecommendationResponse> generateRecommendation(
+            Authentication authentication,
+            @RequestBody RecommendationRequest request) {
+        Long userId = Long.parseLong(authentication.getName());
+        request.setUserID(userId);
+        return ResponseEntity.ok(recommendationService.generateRecommendation(request));
     }
 
-    @GetMapping("/user/{userId}")
-    public ResponseEntity<List<Recommendation>> getUserRecommendations(
-@PathVariable Long userId
-    ){
-       List <Recommendation> recommendationList=recommendationService.getUserRecommendations(userId);
-        return ResponseEntity.ok(recommendationList);
-
-
+    @GetMapping
+    public ResponseEntity<List<RecommendationResponse>> getUserRecommendations(
+            Authentication authentication) {
+        Long userId = Long.parseLong(authentication.getName());
+        return ResponseEntity.ok(recommendationService.getUserRecommendations(userId));
     }
 
     @GetMapping("/activity/{activityId}")
-    public ResponseEntity<List<Recommendation>> getActivityRecommendations(
-            @PathVariable Long activityId
-    ){
-        List <Recommendation> recommendationList=recommendationService.getActivityRecommendations(activityId);
-        return ResponseEntity.ok(recommendationList);
+    public ResponseEntity<List<RecommendationResponse>> getActivityRecommendations(
+            Authentication authentication,
+            @PathVariable Long activityId) {
+        Long userId = Long.parseLong(authentication.getName());
+        return ResponseEntity.ok(recommendationService.getActivityRecommendations(activityId, userId));
+    }
 
+    @GetMapping("/{id}")
+    public ResponseEntity<RecommendationResponse> getRecommendationById(
+            Authentication authentication,
+            @PathVariable Long id) {
+        Long userId = Long.parseLong(authentication.getName());
+        return ResponseEntity.ok(recommendationService.getRecommendationById(id, userId));
+    }
 
+    @DeleteMapping("/{id}")
+    public ResponseEntity<String> deleteRecommendation(
+            Authentication authentication,
+            @PathVariable Long id) {
+        Long userId = Long.parseLong(authentication.getName());
+        recommendationService.deleteRecommendation(id, userId);
+        return ResponseEntity.ok("Recommendation deleted successfully");
     }
 }
