@@ -1,0 +1,8 @@
+spring.application.name=Fitness-tracker
+spring.datasource.url=${DB_URL}
+spring.datasource.username=${DB_USER}
+spring.datasource.password=${DB_PWD}
+spring.jpa.hibernate.ddl-auto=update
+spring.jpa.show-sql=true
+spring.security.user.name=narendra
+spring.security.user.password=your_password
