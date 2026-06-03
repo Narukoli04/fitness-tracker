@@ -140,6 +140,7 @@ public class ActivityService {
         stats.put(
                 "activityByType",
                 activities.stream()
+                        .filter(a -> a.getType() != null)
                         .collect(Collectors.groupingBy(
                                 a -> a.getType().name(),
                                 Collectors.counting()

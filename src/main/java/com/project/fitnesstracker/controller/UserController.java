@@ -31,17 +31,32 @@ public class UserController {
         return ResponseEntity.ok(userService.register(registerRequest));
     }
 
-    @PostMapping("/login")
-    public ResponseEntity<LoginResponce> login(@RequestBody LoginRequest loginRequest) {
-        try {
-            User user = userService.authenticate(loginRequest);
-            String token = jwtUtils.genrateToken(user.getId(), user.getRole().name());
-            return ResponseEntity.ok(new LoginResponce(token, userService.maptoResponce(user)));
-        } catch (AuthenticationException e) {
-            e.printStackTrace();
-            return ResponseEntity.status(401).build();
-        }
+//    @PostMapping("/login")
+//    public ResponseEntity<LoginResponce> login(@RequestBody LoginRequest loginRequest) {
+//        try {
+//            User user = userService.authenticate(loginRequest);
+//            String token = jwtUtils.genrateToken(user.getId(), user.getRole().name());
+//            return ResponseEntity.ok(new LoginResponce(token, userService.maptoResponce(user)));
+//        } catch (AuthenticationException e) {
+//            e.printStackTrace();
+//            return ResponseEntity.status(401).build();
+//        }
+//    }
+@PostMapping("/login")
+public ResponseEntity<LoginResponce> login(@RequestBody LoginRequest loginRequest) {
+
+    System.out.println("EMAIL = " + loginRequest.getEmail());
+    System.out.println("PASSWORD = " + loginRequest.getPassword());
+
+    try {
+        User user = userService.authenticate(loginRequest);
+        String token = jwtUtils.genrateToken(user.getId(), user.getRole().name());
+        return ResponseEntity.ok(new LoginResponce(token, userService.maptoResponce(user)));
+    } catch (Exception e) {
+        e.printStackTrace();
+        return ResponseEntity.status(401).build();
     }
+}
 
     @GetMapping("/profile")
     public ResponseEntity<UserResponce> getProfile(Authentication authentication) {
