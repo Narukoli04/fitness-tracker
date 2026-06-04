@@ -41,6 +41,7 @@ public class UserService {
         UserResponce userResponce = new UserResponce();
         userResponce.setId(savedUser.getId());
         userResponce.setEmail(savedUser.getEmail());
+        userResponce.setRole(savedUser.getRole());
         userResponce.setFirstName(savedUser.getFirstName());
         userResponce.setLastName(savedUser.getLastName());
         userResponce.setCreatedAt(savedUser.getCreatedAt());

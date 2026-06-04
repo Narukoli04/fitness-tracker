@@ -1,5 +1,6 @@
 package com.project.fitnesstracker.dto;
 
+import com.project.fitnesstracker.entity.UserRole;
 import lombok.*;
 
 import java.time.LocalDateTime;
@@ -14,6 +15,7 @@ public class UserResponce {
     private String email;
     private String firstName;
     private String lastName;
+    private UserRole role;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
 
